@@ -13,9 +13,8 @@
                         :class="{ danger: insufficientFunds }">
                 </div>
                 <div class="pull-right">
-                    <button class="btn btn-success" @click="buyStock"
-                        :disabled="insufficientFunds || +quantity <= 0">{{
-                            insufficientFunds ? 'Insufficient Funds' : 'Buy' }}
+                    <button class="btn btn-success" @click="handleBuy" :disabled="insufficientFunds || +quantity <= 0">{{
+                        insufficientFunds ? 'Insufficient Funds' : 'Buy' }}
                     </button>
                 </div>
             </div>
@@ -30,6 +29,7 @@
 </style>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
 export default {
     props: ['stock'],
     data() {
@@ -38,23 +38,24 @@ export default {
         }
     },
     computed: {
-        funds() {
-            return this.$store.getters.funds;
-        },
+        ...mapGetters(['funds']),
         insufficientFunds() {
             return this.quantity * this.stock.price > this.funds;
         }
     },
     methods: {
-        buyStock() {
+        ...mapActions(['buyStock']),
+
+        handleBuy() {
             const order = {
                 stockId: this.stock.id,
                 stockPrice: this.stock.price,
                 quantity: +this.quantity
             };
-            this.$store.dispatch('buyStock', order);
+            this.buyStock(order);
             this.quantity = 0;
         }
     }
+
 }
 </script>
